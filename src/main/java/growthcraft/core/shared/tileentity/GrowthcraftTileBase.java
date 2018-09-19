@@ -19,6 +19,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 
 /**
@@ -31,6 +32,39 @@ import net.minecraftforge.common.capabilities.Capability;
 public abstract class GrowthcraftTileBase extends TileEntity implements IStreamable, IAltNBTSerializable
 {
 	protected static TileEventHandlerMap<GrowthcraftTileBase> HANDLERS = new TileEventHandlerMap<GrowthcraftTileBase>();
+	
+	protected boolean hasMaster;
+	protected int masterOffsX;
+	protected int masterOffsY;
+	protected int masterOffsZ;
+	
+	public boolean hasMaster() {
+		return hasMaster;
+	}
+	
+	public GrowthcraftTileBase getMaster() {
+		if( !hasMaster )
+			return null;
+
+		BlockPos masterPos = new BlockPos(pos.getX()+masterOffsX, pos.getY()+masterOffsY, pos.getZ()+masterOffsZ);
+		TileEntity ent = world.getTileEntity(masterPos);
+		if( ent == null )
+			return null;
+		if( !getClass().isAssignableFrom(ent.getClass()) )
+			return null;
+		return (GrowthcraftTileBase)ent;
+	}
+	
+	protected void setMaster( GrowthcraftTileBase master ) {
+		if( !getClass().isAssignableFrom(master.getClass()) )
+			throw new IllegalArgumentException("Incompatible class.");
+		BlockPos masterPos = master.getPos();
+		
+		hasMaster = true;
+		masterOffsX = masterPos.getX() - pos.getX();
+		masterOffsY = masterPos.getY() - pos.getY();
+		masterOffsZ = masterPos.getZ() - pos.getZ();
+	}
 
 	public void markForUpdate()
 	{
@@ -60,6 +94,8 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final boolean writeToStream(ByteBuf stream)
 	{
+		// TODO: Handle slave state here.
+		
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_WRITE);
 		if (handlers != null)
 		{
@@ -107,6 +143,8 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final boolean readFromStream(ByteBuf stream)
 	{
+		// TODO: Handle slave state here.
+		
 		boolean shouldUpdate = false;
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_READ);
 		if (handlers != null)
@@ -143,15 +181,19 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 
 	public void readFromNBTForItem(NBTTagCompound tag)
 	{
+		// TODO: Make final and handle slave state here.
 	}
 
 	public void writeToNBTForItem(NBTTagCompound tag)
 	{
+		// TODO: Make final and handle slave state here.
 	}
 
 	@Override
 	public final void readFromNBT(NBTTagCompound nbt)
 	{
+		// TODO: Handle slave state here.
+		
 		super.readFromNBT(nbt);
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_READ);
 		if (handlers != null)
@@ -166,6 +208,8 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
+		// TODO: Handle slave state here.
+		
 		super.writeToNBT(nbt);
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_WRITE);
 		if (handlers != null)
