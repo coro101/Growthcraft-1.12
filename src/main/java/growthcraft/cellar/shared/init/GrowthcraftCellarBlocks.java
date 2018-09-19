@@ -8,6 +8,7 @@ public class GrowthcraftCellarBlocks {
 
     public static BlockDefinition brewKettle;
     public static BlockDefinition fermentBarrel;
+    public static BlockDefinition bigFermentBarrelPart;
     public static BlockDefinition cultureJar;
     public static BlockDefinition fruitPress;
     public static BlockDefinition fruitPresser;

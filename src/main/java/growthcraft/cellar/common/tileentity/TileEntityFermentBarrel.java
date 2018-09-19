@@ -28,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
@@ -55,7 +56,20 @@ public class TileEntityFermentBarrel extends TileEntityCellarDevice implements I
 
 	// Constants
 	private static final int[] accessableSlotIds = new int[] {0};
-	private final FermentBarrel fermentBarrel = new FermentBarrel(this, 0, 1, 0);
+	private FermentBarrel fermentBarrel = new FermentBarrel(this, 0, 1, 0);
+	
+/*	private TileEntityFermentBarrel master = null;
+	private BlockPos masterPos = null;	
+
+	public void setMaster(BlockPos pos, TileEntityFermentBarrel master) {
+		this.masterPos = pos;
+		this.master = master;
+		this.fermentBarrel = master.fermentBarrel;
+	}
+	
+	public boolean isMaster() {
+		return master != null;
+	} */
 
 	@Override
 	protected FluidTank[] createTanks()
@@ -112,7 +126,8 @@ public class TileEntityFermentBarrel extends TileEntityCellarDevice implements I
 	{
 		if (!world.isRemote)
 		{
-			fermentBarrel.update();
+//			if( isMaster() )
+				fermentBarrel.update();
 		}
 	}
 

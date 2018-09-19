@@ -35,10 +35,10 @@ public class MultiFermentBarrel {
 		return true;
 	} */
 	
-	public static boolean isValidBigBarrelStructure(IBlockAccess world, BlockPos pos) {
+	public static boolean isValidBigBarrelStructure(BlockStateRegion region, BlockPos pos) {
 		// Check if center is occupied
 		{
-			IBlockState state = world.getBlockState(pos);
+			IBlockState state = region.getBlockState(pos);
 			if( state.getBlock() != Blocks.AIR )
 				return false;
 		}
@@ -46,16 +46,16 @@ public class MultiFermentBarrel {
 		// Determine direction
 		EnumFacing direction = null;
 		{
-			IBlockState stateNorth = world.getBlockState(pos.north());
+			IBlockState stateNorth = region.getBlockState(pos.north());
 			direction = getDirectionFrom(stateNorth);
 			if( direction == null )
 				return false;
 			
-			IBlockState stateSouth = world.getBlockState(pos.south());
-			IBlockState stateEast = world.getBlockState(pos.east());
-			IBlockState stateWest = world.getBlockState(pos.west());
-			IBlockState stateUp = world.getBlockState(pos.up());
-			IBlockState stateDown = world.getBlockState(pos.down());
+			IBlockState stateSouth = region.getBlockState(pos.south());
+			IBlockState stateEast = region.getBlockState(pos.east());
+			IBlockState stateWest = region.getBlockState(pos.west());
+			IBlockState stateUp = region.getBlockState(pos.up());
+			IBlockState stateDown = region.getBlockState(pos.down());
 			IBlockState states[] = new IBlockState[] {stateSouth, stateEast, stateWest, stateUp, stateDown};
 			if( !isAllSameDirection(states, direction) )
 				return false;
@@ -65,11 +65,11 @@ public class MultiFermentBarrel {
 		{
 			BlockPos east = pos.east();
 			BlockPos west = pos.west();
-			if( !isOrientedCorrectly8(world, east, direction) )
+			if( !isOrientedCorrectly8(region, east, direction) )
 				return false;
-			if( !isOrientedCorrectly4(world, pos, direction) )
+			if( !isOrientedCorrectly4(region, pos, direction) )
 				return false;
-			if( !isOrientedCorrectly8(world, west, direction) )
+			if( !isOrientedCorrectly8(region, west, direction) )
 				return false;
 		}
 		
@@ -94,25 +94,25 @@ public class MultiFermentBarrel {
 		return true;
 	}
 	
-	private static boolean isOrientedCorrectly4(IBlockAccess world, BlockPos pos, EnumFacing direction) {
+	private static boolean isOrientedCorrectly4(BlockStateRegion region, BlockPos pos, EnumFacing direction) {
 		BlockPos up = pos.up();
 		BlockPos down = pos.down();
-		IBlockState stateUpNorth = world.getBlockState(up.north());
-		IBlockState stateUpSouth = world.getBlockState(up.south());
-		IBlockState stateDownNorth = world.getBlockState(down.north());
-		IBlockState stateDownSouth = world.getBlockState(down.south());
+		IBlockState stateUpNorth = region.getBlockState(up.north());
+		IBlockState stateUpSouth = region.getBlockState(up.south());
+		IBlockState stateDownNorth = region.getBlockState(down.north());
+		IBlockState stateDownSouth = region.getBlockState(down.south());
 		IBlockState states[] = new IBlockState[] {stateUpNorth, stateUpSouth, stateDownNorth, stateDownSouth};
 		
 		return isAllSameDirection(states, direction);
 	}
 	
-	private static boolean isOrientedCorrectly8(IBlockAccess world, BlockPos pos, EnumFacing direction) {
-		if( !isOrientedCorrectly4(world, pos, direction) )
+	private static boolean isOrientedCorrectly8(BlockStateRegion region, BlockPos pos, EnumFacing direction) {
+		if( !isOrientedCorrectly4(region, pos, direction) )
 			return false;
-		IBlockState stateUp = world.getBlockState(pos.up());
-		IBlockState stateDown = world.getBlockState(pos.down());
-		IBlockState stateNorth = world.getBlockState(pos.north());
-		IBlockState stateSouth = world.getBlockState(pos.south());
+		IBlockState stateUp = region.getBlockState(pos.up());
+		IBlockState stateDown = region.getBlockState(pos.down());
+		IBlockState stateNorth = region.getBlockState(pos.north());
+		IBlockState stateSouth = region.getBlockState(pos.south());
 		IBlockState states[] = new IBlockState[] {stateUp, stateDown, stateNorth, stateSouth};
 		
 		return isAllSameDirection(states, direction);
@@ -139,6 +139,7 @@ public class MultiFermentBarrel {
 		}
 		
 		public BlockStateRegion fillBy(IBlockAccess world) {
+			// TODO: Test what happens on world Y borders!
 			int idx = 0; 
 			for( int iY = pMin.getY(); iY <= pMax.getY(); iY ++ ) {
 				for( int iZ = pMin.getZ(); iZ <= pMax.getZ(); iZ ++ ) {
@@ -171,14 +172,14 @@ public class MultiFermentBarrel {
 			return true;
 		}
 
-		public BlockStateRegion setState(BlockPos pos, IBlockState state) {
+		public BlockStateRegion setBlockState(BlockPos pos, IBlockState state) {
 			if( !isInBounds(pos) )
 				throw new IllegalArgumentException("Point out of bounds of the region.");
 			states[getLocalIndexFor(pos)] = state;
 			return this;
 		}
 		
-		public IBlockState getState(BlockPos pos) {
+		public IBlockState getBlockState(BlockPos pos) {
 			if( !isInBounds(pos) )
 				throw new IllegalArgumentException("Point out of bounds of the region.");
 			return states[getLocalIndexFor(pos)];
