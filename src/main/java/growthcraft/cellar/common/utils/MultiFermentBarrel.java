@@ -117,4 +117,77 @@ public class MultiFermentBarrel {
 		
 		return isAllSameDirection(states, direction);
 	}
+	
+	public static class BlockStateRegion {
+		private final BlockPos pMin;
+		private final BlockPos pMax;
+		private final IBlockState[] states;
+		
+		public BlockStateRegion(BlockPos pA, BlockPos pB) {
+			// TODO: Refactor me: Move to utils for bounding boxes or find an existing equivalent. 
+			int minX = Math.min(pA.getX(), pB.getX());
+			int minY = Math.min(pA.getY(), pB.getY());
+			int minZ = Math.min(pA.getZ(), pB.getZ());
+			pMin = new BlockPos(minX, minY, minZ);
+
+			int maxX = Math.max(pA.getX(), pB.getX());
+			int maxY = Math.max(pA.getY(), pB.getY());
+			int maxZ = Math.max(pA.getZ(), pB.getZ());
+			pMax = new BlockPos(maxX, maxY, maxZ);
+			
+			states = new IBlockState[getSizeX()*getSizeY()*getSizeZ()];
+		}
+		
+		public BlockStateRegion fillBy(IBlockAccess world) {
+			int idx = 0; 
+			for( int iY = pMin.getY(); iY <= pMax.getY(); iY ++ ) {
+				for( int iZ = pMin.getZ(); iZ <= pMax.getZ(); iZ ++ ) {
+					for( int iX = pMin.getX(); iX <= pMax.getX(); iX ++ ) {
+						states[idx ++] = world.getBlockState(new BlockPos(iX, iY, iZ)); 
+					}
+				}
+			}
+			
+			return this;
+		}
+		
+		public int getSizeX() {
+			return pMax.getX()-pMin.getX()+1;
+		}
+
+		public int getSizeY() {
+			return pMax.getY()-pMin.getY()+1;
+		}
+		
+		public int getSizeZ() {
+			return pMax.getZ()-pMin.getZ()+1;
+		}
+		
+		public boolean isInBounds(BlockPos pos) {
+			if( pos.getX() < pMin.getX() || pos.getX() > pMax.getX() ||
+				pos.getY() < pMin.getY() || pos.getY() > pMax.getY() ||
+				pos.getZ() < pMin.getZ() || pos.getZ() > pMax.getZ() )
+				return false;
+			return true;
+		}
+
+		public BlockStateRegion setState(BlockPos pos, IBlockState state) {
+			if( !isInBounds(pos) )
+				throw new IllegalArgumentException("Point out of bounds of the region.");
+			states[getLocalIndexFor(pos)] = state;
+			return this;
+		}
+		
+		public IBlockState getState(BlockPos pos) {
+			if( !isInBounds(pos) )
+				throw new IllegalArgumentException("Point out of bounds of the region.");
+			return states[getLocalIndexFor(pos)];
+		}
+		
+		private int getLocalIndexFor(BlockPos pos) {
+			int szX = getSizeX();
+			int szZ = getSizeZ();
+			return (pos.getY() - pMin.getY())*szX*szZ + (pos.getZ() - pMin.getZ())*szX + (pos.getX() - pMin.getX());
+		}
+	}
 }
