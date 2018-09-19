@@ -157,6 +157,7 @@ public class TileEntityFermentBarrel extends TileEntityCellarDevice implements I
 	@Override
 	protected void readTanksFromNBT(NBTTagCompound nbt)
 	{
+		// TODO: Its a legacy adapter. Move it somewhere else!
 		if (nbt.hasKey("Tank"))
 		{
 			getFluidTank(0).readFromNBT(nbt.getCompoundTag("Tank"));
@@ -167,10 +168,10 @@ public class TileEntityFermentBarrel extends TileEntityCellarDevice implements I
 		}
 	}
 
-	@Override
-	public void readFromNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
+	public void readFromNBTForItem_FermentBarrel(NBTTagCompound nbt)
 	{
-		super.readFromNBTForItem(nbt);
+//		super.readFromNBTForItem(nbt);
 		fermentBarrel.readFromNBT(nbt, "ferment_barrel");
 	}
 
@@ -180,10 +181,10 @@ public class TileEntityFermentBarrel extends TileEntityCellarDevice implements I
 		fermentBarrel.readFromNBT(nbt, "ferment_barrel");
 	}
 
-	@Override
-	public void writeToNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
+	public void writeToNBTForItem_FermentBarrel(NBTTagCompound nbt)
 	{
-		super.writeToNBTForItem(nbt);
+//		super.writeToNBTForItem(nbt);
 		fermentBarrel.writeToNBT(nbt, "ferment_barrel");
 	}
 

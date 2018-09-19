@@ -46,7 +46,7 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 
 	protected void markFluidDirty()
 	{
-		// TODO: Handle slave state here.
+		// TODO: Decide how to handle slave state here.
 		
 		markDirty();
 	}
@@ -272,11 +272,11 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 			tanks.readFromNBT(nbt);
 	}
 
-	@Override
-	public void readFromNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
+	public void readFromNBTForItem_DeviceBase(NBTTagCompound nbt)
 	{
-		// TODO: Make final and handle slave state here.
-		super.readFromNBTForItem(nbt);
+		// NOTE: No slave call
+//		super.readFromNBTForItem(nbt);
 		readTanksFromNBT(nbt);
 	}
 
@@ -294,11 +294,11 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 			tanks.writeToNBT(nbt);
 	}
 
-	@Override
-	public void writeToNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
+	public void writeToNBTForItem_DeviceBase(NBTTagCompound nbt)
 	{
-		// TODO: Make final and handle slave state here.
-		super.writeToNBTForItem(nbt);
+		// NOTE: No slave call
+//		super.writeToNBTForItem(nbt);
 		writeTanksToNBT(nbt);
 	}
 

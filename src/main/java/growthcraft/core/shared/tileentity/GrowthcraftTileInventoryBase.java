@@ -258,11 +258,11 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 		}
 	}
 
-	@Override
-	public void readFromNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
+	public void readFromNBTForItem_Inventory(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-		super.readFromNBTForItem(nbt);
+//		super.readFromNBTForItem(nbt);
 		readInventoryFromNBT(nbt);
 		// Do not reload the inventory name from NBT, allow the ItemStack to do that
 		//readInventoryNameFromNBT(nbt);
@@ -288,11 +288,11 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 		nbt.setInteger("inventory_tile_version", 3);
 	}
 
-	@Override
-	public void writeToNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
+	public void writeToNBTForItem_Inevntory(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-		super.writeToNBTForItem(nbt);
+//		super.writeToNBTForItem(nbt);
 		writeInventoryToNBT(nbt);
 	}
 

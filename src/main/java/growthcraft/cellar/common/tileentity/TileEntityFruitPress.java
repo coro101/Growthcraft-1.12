@@ -140,6 +140,7 @@ public class TileEntityFruitPress extends TileEntityCellarDevice implements ITic
 	{
 		if (nbt.hasKey("Tank"))
 		{
+			// TODO: Its a legacy adapter. Move it somewhere else!
 			getFluidTank(0).readFromNBT(nbt.getCompoundTag("Tank"));
 		}
 		else

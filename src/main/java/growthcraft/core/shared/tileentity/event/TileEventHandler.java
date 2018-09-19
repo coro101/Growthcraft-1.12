@@ -17,7 +17,9 @@ public @interface TileEventHandler
 		NETWORK_WRITE,
 		NETWORK_READ,
 		NBT_WRITE,
-		NBT_READ;
+		NBT_ITEM_WRITE,
+		NBT_READ,
+		NBT_ITEM_READ;
 	}
 
 	EventType event();

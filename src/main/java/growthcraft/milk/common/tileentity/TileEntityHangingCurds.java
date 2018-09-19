@@ -149,10 +149,10 @@ public class TileEntityHangingCurds extends GrowthcraftTileBase implements ITick
 		wheyPulsar.readFromNBT(nbt, "whey_pulsar");
 	}
 
-	@Override
-	public void readFromNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
+	public void readFromNBTForItem_HangingCurds(NBTTagCompound nbt)
 	{
-		super.readFromNBTForItem(nbt);
+//		super.readFromNBTForItem(nbt);
 		readCheeseCurdFromNBT(nbt);
 		readWheyPulsarFromNBT(nbt);
 	}
@@ -174,10 +174,10 @@ public class TileEntityHangingCurds extends GrowthcraftTileBase implements ITick
 		wheyPulsar.writeToNBT(nbt, "whey_pulsar");
 	}
 
-	@Override
-	public void writeToNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
+	public void writeToNBTForItem_HangingCurds(NBTTagCompound nbt)
 	{
-		super.writeToNBTForItem(nbt);
+//		super.writeToNBTForItem(nbt);
 		writeCheeseCurdToNBT(nbt);
 		writeWheyPulsarToNBT(nbt);
 	}

@@ -71,10 +71,10 @@ public class TileEntityCheeseBlock extends GrowthcraftTileBase implements ITicka
 	 *
 	 * @param nbt  tag compound to read
 	 */
-	@Override
-	public void readFromNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
+	public void readFromNBTForItem_CheeseBlock(NBTTagCompound nbt)
 	{
-		super.readFromNBTForItem(nbt);
+//		super.readFromNBTForItem(nbt);
 		readCheeseFromNBT(nbt);
 	}
 
@@ -89,10 +89,10 @@ public class TileEntityCheeseBlock extends GrowthcraftTileBase implements ITicka
 		cheese.writeToNBT(nbt);
 	}
 
-	@Override
-	public void writeToNBTForItem(NBTTagCompound nbt)
+	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
+	public void writeToNBTForItem_CheeseBlock(NBTTagCompound nbt)
 	{
-		super.writeToNBTForItem(nbt);
+//		super.writeToNBTForItem(nbt);
 		writeCheeseToNBT(nbt);
 	}
 
