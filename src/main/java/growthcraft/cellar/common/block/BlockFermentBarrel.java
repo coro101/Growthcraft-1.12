@@ -26,8 +26,8 @@ import net.minecraft.world.World;
 
 public class BlockFermentBarrel extends BlockCellarContainer implements IRotatableBlock {
 	
-	private static final PropertyEnum<BarrelRotation> TYPE_BARREL_ROTATION = PropertyEnum.create("brotation", BarrelRotation.class);
-	private static final PropertyBool TYPE_TAP = PropertyBool.create("hastap");
+	public static final PropertyEnum<BarrelRotation> TYPE_BARREL_ROTATION = PropertyEnum.create("brotation", BarrelRotation.class);
+	public static final PropertyBool TYPE_TAP = PropertyBool.create("hastap");
 
 	public BlockFermentBarrel(String unlocalizedName) {
 		super(Material.WOOD);
