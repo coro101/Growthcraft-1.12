@@ -182,11 +182,13 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	public void readFromNBTForItem(NBTTagCompound tag)
 	{
 		// TODO: Make final and handle slave state here.
+		// Possibly use also an event type.
 	}
 
 	public void writeToNBTForItem(NBTTagCompound tag)
 	{
 		// TODO: Make final and handle slave state here.
+		// Possibly use also an event type.
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 
 	protected FluidTank[] createTanks()
 	{
-		// TODO: Make final and handle slave state here.
+		// TODO: Decide how to handle slave state here.
 		
 		return new FluidTank[] {};
 	}
