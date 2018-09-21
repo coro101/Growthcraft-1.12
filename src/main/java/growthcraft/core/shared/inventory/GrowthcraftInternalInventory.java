@@ -13,7 +13,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
-public class GrowthcraftInternalInventory implements IInventory, INBTSerializableContext
+public class GrowthcraftInternalInventory extends GrowthcraftAbstractInventory implements INBTSerializableContext
 {
 	public static final int WILDCARD_SLOT = -1;
 
@@ -21,12 +21,11 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 	protected ItemStack[] items;
 	protected int maxSize;
 	protected int maxStackSize;
-	protected Object parent;
 
 	public GrowthcraftInternalInventory(Object par, int size, int maxStack)
 	{
+		super(par);
 		this.inventoryName = "grc.inventory.internal.name";
-		this.parent = par;
 		this.maxSize = size;
 		this.maxStackSize = maxStack;
 		this.items = new ItemStack[maxSize];
@@ -42,22 +41,10 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 		return maxSize;
 	}
 
-	protected void onSlotChanged(int index)
-	{
-		if (parent instanceof IInventoryWatcher)
-		{
-			((IInventoryWatcher)parent).onInventoryChanged(this, index);
-		}
-		else if (parent instanceof IInventory)
-		{
-			((IInventory)parent).markDirty();
-		}
-	}
-
 	@Override
 	public void markDirty()
 	{
-		onSlotChanged(WILDCARD_SLOT);
+		onInventoryChanged(this, WILDCARD_SLOT);
 	}
 
 	public void clear()
@@ -66,7 +53,7 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 		{
 			items[i] = null;
 		}
-		onSlotChanged(WILDCARD_SLOT);
+		onInventoryChanged(this, WILDCARD_SLOT);
 	}
 
 	/**
@@ -83,7 +70,7 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 	{
 		this.items = ItemUtils.clearInventorySlots(items, getSizeInventory());
 		NBTHelper.readInventorySlotsFromNBT(items, data);
-		onSlotChanged(WILDCARD_SLOT);
+		onInventoryChanged(this, WILDCARD_SLOT);
 	}
 
 	@Override
@@ -184,17 +171,12 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 				final int discarded = stack.getCount() - getInventoryStackLimit();
 				items[index].setCount( getInventoryStackLimit() );
 				if (discarded > 0)
-				{
-					if (parent instanceof IInventoryWatcher)
-					{
-						((IInventoryWatcher)parent).onItemDiscarded(this, stack, index, discarded);
-					}
-				}
+					onItemDiscarded(this, stack, index, discarded);
 			}
 		}
 		if (oldStack != stack)
 		{
-			onSlotChanged(index);
+			onInventoryChanged(this, index);
 		}
 	}
 
@@ -203,7 +185,8 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 	{
 		final ItemStack stack = items[index];
 		items[index] = null;
-		if (!ItemUtils.isEmpty(stack)) onSlotChanged(index);
+		if (!ItemUtils.isEmpty(stack))
+			onInventoryChanged(this, index);
 		return stack;
 	}
 
@@ -228,7 +211,7 @@ public class GrowthcraftInternalInventory implements IInventory, INBTSerializabl
 					items[index] = null;
 				}
 			}
-			onSlotChanged(index);
+			onInventoryChanged(this, index);
 			return itemstack;
 		}
 		return null;

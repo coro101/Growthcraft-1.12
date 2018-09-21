@@ -181,7 +181,7 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 
 	public final void readFromNBTForItem(NBTTagCompound tag)
 	{
-		// TODO: Make final and handle slave state here.
+		// TODO: Handle slave state here.
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_ITEM_READ);
 		if (handlers != null)
 		{
@@ -194,7 +194,7 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 
 	public final void writeToNBTForItem(NBTTagCompound tag)
 	{
-		// TODO: Make final and handle slave state here.
+		// TODO: Handle slave state here.
 		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_ITEM_WRITE);
 		if (handlers != null)
 		{
