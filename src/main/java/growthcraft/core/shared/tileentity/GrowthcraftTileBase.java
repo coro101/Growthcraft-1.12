@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import growthcraft.core.shared.block.BlockFlags;
 import growthcraft.core.shared.io.nbt.IAltNBTSerializable;
+import growthcraft.core.shared.io.nbt.NBTHelper;
 import growthcraft.core.shared.io.stream.IStreamable;
 import growthcraft.core.shared.tileentity.event.TileEventFunction;
 import growthcraft.core.shared.tileentity.event.TileEventHandler;
@@ -45,6 +46,9 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	public GrowthcraftTileBase getMaster() {
 		if( !hasMaster )
 			return null;
+		
+		if( masterOffsX == 0 && masterOffsY == 0 && masterOffsZ == 0 )
+			return null;	// Invalid!
 
 		BlockPos masterPos = new BlockPos(pos.getX()+masterOffsX, pos.getY()+masterOffsY, pos.getZ()+masterOffsZ);
 		TileEntity ent = world.getTileEntity(masterPos);
@@ -68,6 +72,8 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 
 	public void markForUpdate()
 	{
+		// TODO: Notify all slaves!
+		
 		IBlockState curState = getWorld().getBlockState(pos);
         world.markBlockRangeForRenderUpdate(pos, pos);
         world.notifyBlockUpdate(pos, curState, curState, BlockFlags.UPDATE_AND_SYNC);
@@ -94,15 +100,20 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final boolean writeToStream(ByteBuf stream)
 	{
-		// TODO: Handle slave state here.
-		
-		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_WRITE);
-		if (handlers != null)
-		{
-			for (TileEventFunction func : handlers)
+		if( !hasMaster ) {
+			final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_WRITE);
+			if (handlers != null)
 			{
-				func.writeToStream(this, stream);
+				for (TileEventFunction func : handlers)
+				{
+					func.writeToStream(this, stream);
+				}
 			}
+		}
+		else {
+			stream.writeInt(masterOffsX);
+			stream.writeInt(masterOffsY);
+			stream.writeInt(masterOffsZ);
 		}
 		return false;
 	}
@@ -143,21 +154,27 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final boolean readFromStream(ByteBuf stream)
 	{
-		// TODO: Handle slave state here.
-		
-		boolean shouldUpdate = false;
-		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_READ);
-		if (handlers != null)
-		{
-			for (TileEventFunction func : handlers)
+		if( !hasMaster ) {
+			boolean shouldUpdate = false;
+			final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NETWORK_READ);
+			if (handlers != null)
 			{
-				if (func.readFromStream(this, stream))
+				for (TileEventFunction func : handlers)
 				{
-					shouldUpdate = true;
+					if (func.readFromStream(this, stream))
+					{
+						shouldUpdate = true;
+					}
 				}
 			}
+			return shouldUpdate;
 		}
-		return shouldUpdate;
+		else {
+			masterOffsX = stream.readInt();
+			masterOffsY = stream.readInt();
+			masterOffsZ = stream.readInt();
+			return false;
+		}
 	}
 
 	@Override
@@ -208,34 +225,46 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 	@Override
 	public final void readFromNBT(NBTTagCompound nbt)
 	{
-		// TODO: Handle slave state here.
-		
 		super.readFromNBT(nbt);
-		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_READ);
-		if (handlers != null)
-		{
-			for (TileEventFunction func : handlers)
+		if( !hasMaster ) {			
+			final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_READ);
+			if (handlers != null)
 			{
-				func.readFromNBT(this, nbt);
+				for (TileEventFunction func : handlers)
+				{
+					func.readFromNBT(this, nbt);
+				}
 			}
+		}
+		else {
+			NBTTagCompound posTag = nbt.getCompoundTag("master");
+			masterOffsX = NBTHelper.getInteger(posTag, "masterOffsX");
+			masterOffsY = NBTHelper.getInteger(posTag, "masterOffsY");
+			masterOffsZ = NBTHelper.getInteger(posTag, "masterOffsZ");
 		}
 	}
 
 	@Override
 	public final NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
-		// TODO: Handle slave state here.
-		
 		super.writeToNBT(nbt);
-		final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_WRITE);
-		if (handlers != null)
-		{
-			for (TileEventFunction func : handlers)
+		if( !hasMaster ) {			
+			final List<TileEventFunction> handlers = getHandlersFor(TileEventHandler.EventType.NBT_WRITE);
+			if (handlers != null)
 			{
-				func.writeToNBT(this, nbt);
+				for (TileEventFunction func : handlers)
+				{
+					func.writeToNBT(this, nbt);
+				}
 			}
 		}
-		
+		else {
+			NBTTagCompound posTag = new NBTTagCompound();
+			posTag.setInteger("masterOffsX", masterOffsX);
+			posTag.setInteger("masterOffsY", masterOffsY);
+			posTag.setInteger("masterOffsZ", masterOffsZ);
+			nbt.setTag("master", posTag);
+		}
 		return nbt;
 	}
 }

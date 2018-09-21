@@ -46,6 +46,7 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 		return (GrowthcraftTileDeviceBase)master;
 	}
 	
+	@Override
 	public void setMaster( GrowthcraftTileBase master ) {
 		super.setMaster(master);
 		this.tanks = new DelegatedFluidTanks(
