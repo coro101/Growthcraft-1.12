@@ -1,8 +1,11 @@
 package growthcraft.core.shared.fluids;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
 public interface IFluidTanks
 {
@@ -21,4 +24,6 @@ public interface IFluidTanks
 	Fluid getFluid(int slot);
 	void clearTank(int slot);
 	int getTankCount();
+	FluidTankInfo[] getTankInfo(EnumFacing from);
+	IFluidTankProperties[] getTankProperties(EnumFacing from);
 }

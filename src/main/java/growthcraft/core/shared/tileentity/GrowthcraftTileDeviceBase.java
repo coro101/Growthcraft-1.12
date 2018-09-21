@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 
 import growthcraft.core.shared.fluids.FluidTest;
 import growthcraft.core.shared.handlers.FluidHandlerBlockWrapper;
+import growthcraft.core.shared.fluids.DelegatedFluidTanks;
+import growthcraft.core.shared.fluids.NullFluidTanks;
 import growthcraft.core.shared.fluids.FluidTanks;
 import growthcraft.core.shared.fluids.IFluidTanks;
 import growthcraft.core.shared.tileentity.event.TileEventHandler;
@@ -26,7 +28,7 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
  */
 public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventoryBase implements IFluidTankOperable, IFluidTanks
 {
-	private FluidTanks tanks;
+	private IFluidTanks tanks;
 
 	public GrowthcraftTileDeviceBase()
 	{
@@ -42,6 +44,18 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 		if( !getClass().isAssignableFrom(master.getClass()) )
 			return null;
 		return (GrowthcraftTileDeviceBase)master;
+	}
+	
+	public void setMaster( GrowthcraftTileBase master ) {
+		super.setMaster(master);
+		this.tanks = new DelegatedFluidTanks(
+				()->{
+					GrowthcraftTileDeviceBase tdMaster = getMaster();
+					if( tdMaster != null )
+						return tdMaster.tanks;
+					else
+						return new NullFluidTanks();
+				});
 	}
 
 	protected void markFluidDirty()
@@ -268,8 +282,13 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 	protected void readTanksFromNBT(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-		if (tanks != null)
-			tanks.readFromNBT(nbt);
+		FluidTanks masterFluidTanks;
+		if( !(tanks instanceof FluidTanks) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		masterFluidTanks = (FluidTanks)tanks;
+		
+		if (masterFluidTanks != null)
+			masterFluidTanks.readFromNBT(nbt);
 	}
 
 	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_READ)
@@ -290,8 +309,13 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 	private void writeTanksToNBT(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-		if (tanks != null)
-			tanks.writeToNBT(nbt);
+		FluidTanks masterFluidTanks;
+		if( !(tanks instanceof FluidTanks) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		masterFluidTanks = (FluidTanks)tanks;
+		
+		if (masterFluidTanks != null)
+			masterFluidTanks.writeToNBT(nbt);
 	}
 
 	@TileEventHandler(event=TileEventHandler.EventType.NBT_ITEM_WRITE)
@@ -313,8 +337,13 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 	public boolean readFromStream_FluidTanks(ByteBuf stream) throws IOException
 	{
 		// NOTE: No slave call
-		if (tanks != null)
-			tanks.readFromStream(stream);
+		FluidTanks masterFluidTanks;
+		if( !(tanks instanceof FluidTanks) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		masterFluidTanks = (FluidTanks)tanks;
+		
+		if (masterFluidTanks != null)
+			masterFluidTanks.readFromStream(stream);
 		return true;
 	}
 
@@ -322,8 +351,13 @@ public abstract class GrowthcraftTileDeviceBase extends GrowthcraftTileInventory
 	public boolean writeToStream_FluidTanks(ByteBuf stream) throws IOException
 	{
 		// NOTE: No slave call
-		if (tanks != null)
-			tanks.writeToStream(stream);
+		FluidTanks masterFluidTanks;
+		if( !(tanks instanceof FluidTanks) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		masterFluidTanks = (FluidTanks)tanks;
+		
+		if (masterFluidTanks != null)
+			masterFluidTanks.writeToStream(stream);
 		return false;
 	}
 }

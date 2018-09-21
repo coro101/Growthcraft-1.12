@@ -57,13 +57,11 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 
 	public GrowthcraftInternalInventory createInventory()
 	{
-		// TODO: Decide how to handle slave state here.
 		return new GrowthcraftNullInventory(this);
 	}
 
 	public IInventory getInternalInventory()
 	{
-		// TODO: Handle slave state here.
 		return inventory;
 	}
 
@@ -75,7 +73,6 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	@Override
 	public void onInventoryChanged(IInventory inv, int index)
 	{
-		// TODO: Handle slave state here.
 		markDirty();
 	}
 
@@ -94,28 +91,27 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	@Override
 	public String getName()
 	{
-		// TODO: Handle slave state here.
+		// NOTE: Decide how to handle slave state here.
 		return hasCustomName() ? inventoryName : getDefaultInventoryName();
 	}
 
 	@Override
 	public boolean hasCustomName()
 	{
-		// TODO: Handle slave state here.
+		// NOTE: Decide how to handle slave state here.
 		return inventoryName != null && inventoryName.length() > 0;
 	}
 
 	@Override
 	public void setGuiDisplayName(String string)
 	{
-		// TODO: Handle slave state here.
+		// NOTE: Decide how to handle slave state here.
 		this.inventoryName = string;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int index)
 	{
-		// TODO: Handle slave state here.
 		return inventory.getStackInSlot(index);
 	}
 
@@ -140,35 +136,30 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	@Override
 	public ItemStack decrStackSize(int index, int par2)
 	{
-		// TODO: Handle slave state here.
 		return inventory.decrStackSize(index, par2);
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index)
 	{
-		// TODO: Handle slave state here.
 		return inventory.removeStackFromSlot(index);
 	}
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack itemstack)
 	{
-		// TODO: Handle slave state here.
 		inventory.setInventorySlotContents(index, itemstack);
 	}
 
 	@Override
 	public int getInventoryStackLimit()
 	{
-		// TODO: Handle slave state here.
 		return inventory.getInventoryStackLimit();
 	}
 
 	@Override
 	public int getSizeInventory()
 	{
-		// TODO: Handle slave state here.
 		return inventory.getSizeInventory();
 	}
 
@@ -223,31 +214,26 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	
 	@Override
 	public boolean isEmpty() {
-		// TODO: Handle slave state here.
 		return inventory.isEmpty();
 	}
 	
 	@Override
 	public void clear() {
-		// TODO: Handle slave state here.
 		inventory.clear();
 	}
 
 	@Override
 	public int getField(int id) {
-		// TODO: Handle slave state here.
 		return inventory.getField(id);
 	}
 
 	@Override
 	public void setField(int id, int value) {
-		// TODO: Handle slave state here.
 		inventory.setField(id, value);
 	}
 
 	@Override
 	public int getFieldCount() {
-		// TODO: Handle slave state here.
 		return inventory.getFieldCount();
 	}
 
@@ -286,7 +272,6 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	public void readFromNBTForItem_Inventory(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-//		super.readFromNBTForItem(nbt);
 		readInventoryFromNBT(nbt);
 		// Do not reload the inventory name from NBT, allow the ItemStack to do that
 		//readInventoryNameFromNBT(nbt);
@@ -322,7 +307,6 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	public void writeToNBTForItem_Inevntory(NBTTagCompound nbt)
 	{
 		// NOTE: No slave call
-//		super.writeToNBTForItem(nbt);
 		writeInventoryToNBT(nbt);
 	}
 
