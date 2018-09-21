@@ -8,12 +8,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
-public class InventoryDelegate extends GrowthcraftAbstractInventory implements IInventory {
+public class GrowthcraftDelegatedInventory extends GrowthcraftAbstractInventory implements IInventory {
 
 	private WeakReference<GrowthcraftAbstractInventory> cachedInventoryRef;
 	private final Supplier<GrowthcraftAbstractInventory> delegatedSupplier;
 	
-	public InventoryDelegate(Object parent, Supplier<GrowthcraftAbstractInventory> delegatedSupplier) {
+	public GrowthcraftDelegatedInventory(Object parent, Supplier<GrowthcraftAbstractInventory> delegatedSupplier) {
 		super(parent);
 		this.delegatedSupplier = delegatedSupplier;
 		this.cachedInventoryRef = null;

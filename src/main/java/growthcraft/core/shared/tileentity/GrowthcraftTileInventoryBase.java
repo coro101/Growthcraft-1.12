@@ -1,6 +1,9 @@
 package growthcraft.core.shared.tileentity;
 
+import growthcraft.core.shared.inventory.GrowthcraftAbstractInventory;
+import growthcraft.core.shared.inventory.GrowthcraftDelegatedInventory;
 import growthcraft.core.shared.inventory.GrowthcraftInternalInventory;
+import growthcraft.core.shared.inventory.GrowthcraftNullInventory;
 import growthcraft.core.shared.inventory.IInventoryWatcher;
 import growthcraft.core.shared.inventory.InventoryProcessor;
 import growthcraft.core.shared.item.ItemUtils;
@@ -21,8 +24,14 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	protected static final int[] NO_SLOTS = new int[]{};
 
 	protected String inventoryName;
-	protected GrowthcraftInternalInventory inventory;
+	protected GrowthcraftAbstractInventory inventory;
 
+	public GrowthcraftTileInventoryBase()
+	{
+		super();
+		this.inventory = createInventory();
+	}
+	
 	@Override
 	public GrowthcraftTileInventoryBase getMaster() {
 		GrowthcraftTileBase master = super.getMaster();
@@ -32,20 +41,27 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 			return null;
 		return (GrowthcraftTileInventoryBase)master;
 	}
-	
-	public GrowthcraftTileInventoryBase()
-	{
-		super();
-		this.inventory = createInventory();
+
+	@Override
+	protected void setMaster( GrowthcraftTileBase master ) {
+		super.setMaster(master);
+		this.inventory = new GrowthcraftDelegatedInventory(this,
+				()->{
+					GrowthcraftTileInventoryBase tiMaster = getMaster();
+					if( tiMaster != null )
+						return tiMaster.inventory;
+					else
+						return new GrowthcraftNullInventory(this);
+				});
 	}
 
 	public GrowthcraftInternalInventory createInventory()
 	{
 		// TODO: Decide how to handle slave state here.
-		return new GrowthcraftInternalInventory(this, 0);
+		return new GrowthcraftNullInventory(this);
 	}
 
-	public GrowthcraftInternalInventory getInternalInventory()
+	public IInventory getInternalInventory()
 	{
 		// TODO: Handle slave state here.
 		return inventory;
@@ -66,7 +82,10 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 	@Override
 	public void onItemDiscarded(IInventory inv, ItemStack stack, int index, int discardedAmount)
 	{
-		// TODO: Decide how to handle slave state here.
+		// NOTE: Decide how to handle slave state here.
+		if( hasMaster() )
+			return;	// TODO: Test if it will look cool and items won't be duplicated.
+		
 		final ItemStack discarded = stack.copy();
 		discarded.setCount( discardedAmount );
 		ItemUtils.spawnItemStack(world, pos, discarded, world.rand);
@@ -234,14 +253,19 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 
 	protected void readInventoryFromNBT(NBTTagCompound nbt)
 	{
+		GrowthcraftInternalInventory internalInv;
+		if( !(inventory instanceof GrowthcraftInternalInventory) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		internalInv = (GrowthcraftInternalInventory)inventory;
+		
 		// NOTE: No slave call
 		if (nbt.hasKey("items"))
 		{
-			inventory.readFromNBT(nbt, "items");
+			internalInv.readFromNBT(nbt, "items");
 		}
 		else if (nbt.hasKey("inventory"))
 		{
-			inventory.readFromNBT(nbt, "inventory");
+			internalInv.readFromNBT(nbt, "inventory");
 		}
 	}
 
@@ -278,8 +302,14 @@ public abstract class GrowthcraftTileInventoryBase extends GrowthcraftTileBase i
 
 	private void writeInventoryToNBT(NBTTagCompound nbt)
 	{
-		// NOTE: No slave call		
-		inventory.writeToNBT(nbt, "inventory");
+		// NOTE: No slave call
+		GrowthcraftInternalInventory internalInv;
+		if( !(inventory instanceof GrowthcraftInternalInventory) )
+			throw new IllegalStateException("Shouldn't have been called.");
+		internalInv = (GrowthcraftInternalInventory)inventory;
+				
+		internalInv.writeToNBT(nbt, "inventory");
+		
 		// NAME
 		if (hasCustomName())
 		{
