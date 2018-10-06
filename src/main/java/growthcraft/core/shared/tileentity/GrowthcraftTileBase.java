@@ -238,9 +238,9 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 		}
 		else {
 			NBTTagCompound posTag = nbt.getCompoundTag("master");
-			masterOffsX = NBTHelper.getInteger(posTag, "masterOffsX");
-			masterOffsY = NBTHelper.getInteger(posTag, "masterOffsY");
-			masterOffsZ = NBTHelper.getInteger(posTag, "masterOffsZ");
+			masterOffsX = NBTHelper.getInteger(posTag, "offs_x");
+			masterOffsY = NBTHelper.getInteger(posTag, "offs_y");
+			masterOffsZ = NBTHelper.getInteger(posTag, "offs_z");
 		}
 	}
 
@@ -260,9 +260,9 @@ public abstract class GrowthcraftTileBase extends TileEntity implements IStreama
 		}
 		else {
 			NBTTagCompound posTag = new NBTTagCompound();
-			posTag.setInteger("masterOffsX", masterOffsX);
-			posTag.setInteger("masterOffsY", masterOffsY);
-			posTag.setInteger("masterOffsZ", masterOffsZ);
+			posTag.setInteger("offs_x", masterOffsX);
+			posTag.setInteger("offs_y", masterOffsY);
+			posTag.setInteger("offs_z", masterOffsZ);
 			nbt.setTag("master", posTag);
 		}
 		return nbt;
