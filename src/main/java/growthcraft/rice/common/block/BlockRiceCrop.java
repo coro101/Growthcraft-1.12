@@ -9,6 +9,7 @@ import growthcraft.rice.shared.init.GrowthcraftRiceItems;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -21,10 +22,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -39,10 +42,15 @@ import static growthcraft.core.shared.block.BlockPaddyBase.MOISTURE;
 
 public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, IPaddyCrop {
 
-    // TODO: Add bounding boxes based on the height of the crop.
+    private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[]{
+        new AxisAlignedBB(0.0625 * 2, 0.0625 * 0, 0.0625 * 2, 0.0625 * 14, 0.0625 * 6, 0.0625 * 14),
+        new AxisAlignedBB(0.0625 * 2, 0.0625 * 0, 0.0625 * 2, 0.0625 * 14, 0.0625 * 11, 0.0625 * 14),
+        new AxisAlignedBB(0.0625 * 2, 0.0625 * 0, 0.0625 * 2, 0.0625 * 14, 0.0625 * 15, 0.0625 * 14),
+        new AxisAlignedBB(0.0625 * 2, 0.0625 * 0, 0.0625 * 2, 0.0625 * 14, 0.0625 * 15, 0.0625 * 14),
+        new AxisAlignedBB(0.0625 * 2, 0.0625 * 0, 0.0625 * 2, 0.0625 * 14, 0.0625 * 14, 0.0625 * 14),
+    };
 
-    public static class RiceStage
-    {
+    public static class RiceStage {
         public static final int SPROUTING = 0;
         public static final int SPROUT = 1;
         public static final int SAPLING = 2;
@@ -57,6 +65,7 @@ public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, I
     private static Random rand = new Random();
 
     public BlockRiceCrop(String unlocalizedName) {
+        super(Material.PLANTS, MapColor.YELLOW);
         this.setUnlocalizedName(unlocalizedName);
         this.setRegistryName(Reference.MODID, unlocalizedName);
         setHardness(0.0F);
@@ -69,6 +78,11 @@ public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, I
     @Override
     public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
         super.addInformation(stack, player, tooltip, advanced);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return BOUNDING_BOXES[state.getValue(AGE)];
     }
 
     @Override
@@ -98,6 +112,7 @@ public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, I
         } else if (this.canGrow(worldIn, pos, state, true) ) {
             grow(worldIn, rand, pos, state);
         }
+        super.updateTick(worldIn, pos, state, rand);
 
     }
 
@@ -142,7 +157,9 @@ public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, I
         } else if (downBlockState.getValue(MOISTURE)) {
             int nextAge = getAge(state) + 1;
             if (nextAge <= RiceStage.MATURE && world.getLightFromNeighbors(pos.up()) >= 9 && rand.nextInt(99) <= GrowthcraftRiceConfig.riceGrowthRate) {
-                world.setBlockState(pos, state.withProperty(AGE, nextAge), BlockFlags.SYNC);
+                IBlockState newState = state.withProperty(AGE, nextAge);
+                world.setBlockState(pos, newState, BlockFlags.SYNC);
+                ForgeHooks.onCropsGrowPost(world, pos, state, newState);
             }
             return;
         }
@@ -295,14 +312,12 @@ public class BlockRiceCrop extends BlockBush implements IGrowable, IPlantable, I
     @Override
     @SuppressWarnings("deprecation")
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(AGE, meta & 0x3);
+        return this.getDefaultState().withProperty(AGE, meta);
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        int meta = 0;
-        meta |= state.getValue(AGE) & 0x3;
-        return meta;
+        return state.getValue(AGE);
     }
 
 }
